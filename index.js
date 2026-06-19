@@ -9,22 +9,24 @@ app.use(express.json());
 
 // Set port and verify_token
 const port = process.env.PORT || 3100;
-const verifyToken = process.env.VERIFY_TOKEN;
+const verifyToken = (process.env.VERIFY_TOKEN || process.env.WEBHOOK_VERIFY_TOKEN || '').trim();
+const webhookPaths = ['/', '/webhook'];
 
 // Route for GET requests
-app.get('/', (req, res) => {
+app.get(webhookPaths, (req, res) => {
   const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
+  const receivedToken = String(token ?? '').trim();
 
-  if (mode === 'subscribe' && token === verifyToken) {
+  if (mode === 'subscribe' && receivedToken === verifyToken) {
     console.log('WEBHOOK VERIFIED');
-    res.status(200).send(challenge);
+    res.status(200).send(String(challenge ?? ''));
   } else {
     res.status(403).end();
   }
 });
 
 // Route for POST requests
-app.post('/', (req, res) => {
+app.post(webhookPaths, (req, res) => {
   const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
   console.log(`\n\nWebhook received ${timestamp}\n`);
   console.log(JSON.stringify(req.body, null, 2));
