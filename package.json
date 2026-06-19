@@ -1,0 +1,29 @@
+{
+  "name": "wb-official",
+  "version": "1.0.0",
+  "description": "Test version",
+  "homepage": "https://github.com/dahiya001rohit/test-wb#readme",
+  "bugs": {
+    "url": "https://github.com/dahiya001rohit/test-wb/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dahiya001rohit/test-wb.git"
+  },
+  "license": "ISC",
+  "author": "Rohit",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "expres": "^0.0.5",
+    "express": "^5.2.1"
+  }
+}
