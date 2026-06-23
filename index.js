@@ -1,41 +1,25 @@
-require('dotenv').config();
-
-// Import Express.js
-const express = require('express');
-
-// Create an Express app
+require("dotenv").config();
+import express from "express";
 const app = express();
+const PORT = process.env.PORT || 3000;
+const bodyParser = require("body-parser");
 
-// Middleware to parse JSON bodies
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN; // you invent this — must match the field
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Set port and verify_token
-const port = process.env.PORT || 3100;
-const verifyToken = (process.env.VERIFY_TOKEN || process.env.WEBHOOK_VERIFY_TOKEN || '').trim();
-const webhookPaths = ['/', '/webhook'];
 
-// Route for GET requests
-app.get(webhookPaths, (req, res) => {
-  const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
-  const receivedToken = String(token ?? '').trim();
-
-  if (mode === 'subscribe' && receivedToken === verifyToken) {
-    console.log('WEBHOOK VERIFIED');
-    res.status(200).send(String(challenge ?? ''));
-  } else {
-    res.status(403).end();
+app.get("/whatsapp/webhook", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
   }
+  return res.sendStatus(403);
 });
 
-// Route for POST requests
-app.post(webhookPaths, (req, res) => {
-  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-  console.log(`\n\nWebhook received ${timestamp}\n`);
-  console.log(JSON.stringify(req.body, null, 2));
-  res.status(200).end();
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`\nListening on port ${port}\n`);
-});
+app.listen(PORT, () => console.log(`up on ${PORT}`));
